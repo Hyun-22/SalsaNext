@@ -1,0 +1,74 @@
+################################################################################
+# training parameters
+################################################################################
+train:
+  loss: "xentropy"       # must be either xentropy or iou
+  max_epochs: 20
+  optimizer: "adam"      # adam sgd
+  schedular: "warmupLR"      # warmupLR MultiStepLR
+  lr: 0.001              # sgd learning rate
+  wup_epochs: 1          # warmup during first XX epochs (can be float)
+  momentum: 0.9          # sgd momentum
+  lr_decay: 0.99         # learning rate decay per epoch after initial cycle (from min lr)
+  w_decay: 0.0001         # weight decay
+  batch_size: 4         # batch size
+  report_batch: 20        # every x batches, report loss
+  report_epoch: 1        # every x epochs, report validation set
+  epsilon_w: 0.001       # class weight w = 1 / (content + epsilon_w)
+  save_summary: False    # Summary of weight histograms for tensorboard
+  workers: 4            # number of threads to get data
+
+################################################################################
+# backbone parameters
+################################################################################
+backbone:
+  name: "FCN_model"  # ['squeezeseg', 'squeezesegV2', 'darknet']
+  input_depth:
+    range: True
+    xyz: True
+    remission: True
+  dropout: 0.01
+  bn_d: 0.01
+  OS: 32 # output stride (only horizontally)
+  train: True # train backbone?
+  extra:
+    layers: 21
+
+################################################################################
+# data parameters
+################################################################################
+voxel_config:
+    point_cloud_range : [0, -50, -4, 50, 50, 2]
+    voxel_size : [512, 1024, 128]
+    max_number_of_points_per_voxel : 20
+    max_voxels : 100000
+
+
+################################################################################
+# classification head parameters
+################################################################################
+# dataset (to find parser)
+dataset:
+  labels: "kitti"
+  scans: "kitti"
+  max_points: 300000 # max of any scan in dataset
+  sensor:
+    name: "HDL64"
+    type: "spherical" # projective
+    fov_up: 50
+    fov_down: -30 
+    img_prop:
+      width: 512
+      height: 300
+    img_means: #range,x,y,z,signal
+      - 12.12
+      - 10.88
+      - 0.23
+      - -1.04
+      - 0.21
+    img_stds: #range,x,y,z,signal
+      - 12.32
+      - 11.47
+      - 6.91
+      - 0.86
+      - 0.16

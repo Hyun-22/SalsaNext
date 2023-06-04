@@ -8,6 +8,8 @@ import shutil
 from shutil import copyfile
 import __init__ as booger
 import yaml
+import sys
+sys.path.append("/home/ailab/Desktop/git/SalsaNext/train")
 from tasks.semantic.modules.trainer import *
 from pip._vendor.distlib.compat import raw_input
 
@@ -49,27 +51,29 @@ if __name__ == '__main__':
     parser.add_argument(
         '--dataset', '-d',
         type=str,
-        required=True,
+        required=False,
+        default="/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_30",
         help='Dataset to train with. No Default',
     )
     parser.add_argument(
         '--arch_cfg', '-ac',
         type=str,
-        required=True,
+        required=False,
+        default='/home/ailab/Desktop/git/SalsaNext/train/tasks/semantic/config/arch/salsanext.yaml',
         help='Architecture yaml cfg file. See /config/arch for sample. No default!',
     )
     parser.add_argument(
         '--data_cfg', '-dc',
         type=str,
         required=False,
-        default='config/labels/semantic-kitti.yaml',
+        default='/home/ailab/Desktop/git/SalsaNext/train/tasks/semantic/config/labels/semantic-kitti-mini-weather.yaml',
         help='Classification yaml cfg file. See /config/labels for sample. No default!',
     )
     parser.add_argument(
         '--log', '-l',
         type=str,
-        default="~/output",
-        help='Directory to put the log data. Default: ~/logs/date+time'
+        default='.',
+        help='Directory to put the log data. Default: ./logs/date+time'
     )
     parser.add_argument(
         '--name', '-n',
@@ -81,7 +85,7 @@ if __name__ == '__main__':
         '--pretrained', '-p',
         type=str,
         required=False,
-        default=None,
+        default="",
         help='Directory to get the pretrained model. If not passed, do from scratch!'
     )
     parser.add_argument(
@@ -92,7 +96,8 @@ if __name__ == '__main__':
     )
 
     FLAGS, unparsed = parser.parse_known_args()
-    FLAGS.log = FLAGS.log + '/logs/' + datetime.datetime.now().strftime("%Y-%-m-%d-%H:%M") + FLAGS.name
+    FLAGS.log = FLAGS.log + '/logs/' + datetime.datetime.now().strftime("%Y-%-m-%d-%H:%M:%S") + FLAGS.name
+    os.makedirs(FLAGS.log)
     if FLAGS.uncertainty:
         params = SalsaNextUncertainty(20)
         pytorch_total_params = sum(p.numel() for p in params.parameters() if p.requires_grad)
@@ -143,7 +148,7 @@ if __name__ == '__main__':
                         quit()
                     else:
                         shutil.rmtree(FLAGS.log)
-            os.makedirs(FLAGS.log)
+            os.makedirs(FLAGS.log, exist_ok= True)
         else:
             FLAGS.log = FLAGS.pretrained
             print("Not creating new log file. Using pretrained directory")
@@ -173,5 +178,6 @@ if __name__ == '__main__':
         quit()
 
     # create trainer and start the training
-    trainer = Trainer(ARCH, DATA, FLAGS.dataset, FLAGS.log, FLAGS.pretrained,FLAGS.uncertainty)
+    dataset = ["/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_30", "/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_20", "/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_10", "/home/ailab/AILabDataset/01_Open_Dataset/02_SemanticKITTI/SemanticKITTI_w_images"]
+    trainer = Trainer(ARCH, DATA, dataset, FLAGS.log, FLAGS.pretrained,FLAGS.uncertainty)
     trainer.train()

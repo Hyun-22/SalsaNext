@@ -22,6 +22,7 @@ from tasks.semantic.modules.SalsaNextAdf import *
 from tasks.semantic.modules.Lovasz_Softmax import Lovasz_softmax
 import tasks.semantic.modules.adf as adf
 
+import weakref
 def keep_variance_fn(x):
     return x + 1e-3
 
@@ -57,7 +58,7 @@ def save_to_log(logdir, logfile, message):
 def save_checkpoint(to_save, logdir, suffix=""):
     # Save the weights
     torch.save(to_save, logdir +
-               "/SalsaNext" + suffix)
+               "/SalsaNext.pth" + suffix)
 
 
 class Trainer():
@@ -86,10 +87,12 @@ class Trainer():
                      "valid_iou": 0,
                      "best_train_iou": 0,
                      "best_val_iou": 0}
-
         # get the data
+        print(self.DATA["name"])
+        print(self.DATA["name"])
+        print(self.DATA["name"])
         parserModule = imp.load_source("parserModule",
-                                       booger.TRAIN_PATH + '/tasks/semantic/dataset/' +
+                                       "/home/ailab/Desktop/git/SalsaNext/train" + '/tasks/semantic/dataset/' +
                                        self.DATA["name"] + '/parser.py')
         self.parser = parserModule.Parser(root=self.datadir,
                                           train_sequences=self.DATA["split"]["train"],
@@ -107,7 +110,6 @@ class Trainer():
                                           shuffle_train=True)
 
         # weights for loss (and bias)
-
         epsilon_w = self.ARCH["train"]["epsilon_w"]
         content = torch.zeros(self.parser.get_n_classes(), dtype=torch.float)
         for cl, freq in DATA["content"].items():
@@ -126,7 +128,7 @@ class Trainer():
             else:
                 self.model = SalsaNextUncertainty(self.parser.get_n_classes())
 
-        self.tb_logger = Logger(self.log + "/tb")
+        # self.tb_logger = Logger(self.log + "/tb")
 
         # GPU?
         self.gpu = False
@@ -149,7 +151,6 @@ class Trainer():
             self.multi_gpu = True
             self.n_gpus = torch.cuda.device_count()
 
-
         self.criterion = nn.NLLLoss(weight=self.loss_w).to(self.device)
         self.ls = Lovasz_softmax(ignore=0).to(self.device)
         self.SoftmaxHeteroscedasticLoss = SoftmaxHeteroscedasticLoss().to(self.device)
@@ -162,7 +163,7 @@ class Trainer():
                                    lr=self.ARCH["train"]["lr"],
                                    momentum=self.ARCH["train"]["momentum"],
                                    weight_decay=self.ARCH["train"]["w_decay"])
-
+        
         # Use warmup learning rate
         # post decay and step sizes come in epochs and we want it in steps
         steps_per_epoch = self.parser.get_train_size()
@@ -222,19 +223,18 @@ class Trainer():
         return (out_img).astype(np.uint8)
 
     @staticmethod
-    def save_to_log(logdir, logger, info, epoch, w_summary=False, model=None, img_summary=False, imgs=[]):
+    def save_to_log(logdir, info, epoch, w_summary=False, model=None, img_summary=False, imgs=[]):
         # save scalars
-        for tag, value in info.items():
-            logger.scalar_summary(tag, value, epoch)
+        # for tag, value in info.items():
+        #     logger.scalar_summary(tag, value, epoch)
 
         # save summaries of weights and biases
         if w_summary and model:
             for tag, value in model.named_parameters():
                 tag = tag.replace('.', '/')
-                logger.histo_summary(tag, value.data.cpu().numpy(), epoch)
-                if value.grad is not None:
-                    logger.histo_summary(
-                        tag + '/grad', value.grad.data.cpu().numpy(), epoch)
+                # logger.histo_summary(tag, value.data.cpu().numpy(), epoch)
+                # if value.grad is not None:
+                    # logger.histo_summary(tag + '/grad', value.grad.data.cpu().numpy(), epoch)
 
         if img_summary and len(imgs) > 0:
             directory = os.path.join(logdir, "predictions")
@@ -280,7 +280,7 @@ class Trainer():
             state = {'epoch': epoch, 'state_dict': self.model.state_dict(),
                      'optimizer': self.optimizer.state_dict(),
                      'info': self.info,
-                     'scheduler': self.scheduler.state_dict()
+                    #  'scheduler': self.scheduler.state_dict()
                      }
             save_checkpoint(state, self.log, suffix="")
 
@@ -290,7 +290,7 @@ class Trainer():
                 state = {'epoch': epoch, 'state_dict': self.model.state_dict(),
                          'optimizer': self.optimizer.state_dict(),
                          'info': self.info,
-                         'scheduler': self.scheduler.state_dict()
+                        #  'scheduler': self.scheduler.state_dict()
                          }
                 save_checkpoint(state, self.log, suffix="_train_best")
 
@@ -321,7 +321,7 @@ class Trainer():
                 state = {'epoch': epoch, 'state_dict': self.model.state_dict(),
                          'optimizer': self.optimizer.state_dict(),
                          'info': self.info,
-                         'scheduler': self.scheduler.state_dict()
+                        #  'scheduler': self.scheduler.state_dict()
                          }
                 save_checkpoint(state, self.log, suffix="_valid_best")
 
@@ -329,7 +329,7 @@ class Trainer():
 
             # save to log
             Trainer.save_to_log(logdir=self.log,
-                                logger=self.tb_logger,
+                                # logger=self.tb_logger,
                                 info=self.info,
                                 epoch=epoch,
                                 w_summary=self.ARCH["train"]["save_summary"],
@@ -355,6 +355,7 @@ class Trainer():
 
         # switch to train mode
         model.train()
+        
 
         end = time.time()
         for i, (in_vol, proj_mask, proj_labels, _, path_seq, path_name, _, _, _, _, _, _, _, _, _) in enumerate(train_loader):
