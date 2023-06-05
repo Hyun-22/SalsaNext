@@ -5,6 +5,7 @@
 * Command
 ```
 $ conda activate salsanext_py39
+$ cd train/tasks/semantic
 
 # training 
 $ python train.py -n <name_for_log>
