@@ -185,9 +185,12 @@ class SemanticKitti(Dataset):
         print(len(self.scan_files))
 
     self.len = len(self.scan_files)
+    
+    # training with small sample
+    # self.scan_files = self.scan_files[:100]
+    # self.label_files = self.label_files[:100]
+    
     # sort for correspondance
-    self.scan_files = self.scan_files[:100]
-    self.label_files = self.label_files[:100]
     self.scan_files.sort()
     self.label_files.sort()
 
