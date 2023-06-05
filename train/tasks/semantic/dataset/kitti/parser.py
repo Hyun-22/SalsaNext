@@ -296,7 +296,7 @@ class Parser():
     super(Parser, self).__init__()
 
     # if I am training, get the dataset
-    self.root = root
+    self.root = root[0]
     self.train_sequences = train_sequences
     self.valid_sequences = valid_sequences
     self.test_sequences = test_sequences
