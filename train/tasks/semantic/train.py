@@ -48,13 +48,13 @@ def str2bool(v):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("./train.py")
-    parser.add_argument(
-        '--dataset', '-d',
-        type=str,
-        required=False,
-        default="/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_30",
-        help='Dataset to train with. No Default',
-    )
+    # parser.add_argument(
+    #     '--dataset', '-d',
+    #     type=str,
+    #     required=False,
+    #     default="/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_30",
+    #     help='Dataset to train with. No Default',
+    # )
     parser.add_argument(
         '--arch_cfg', '-ac',
         type=str,
@@ -107,7 +107,7 @@ if __name__ == '__main__':
     # print summary of what we will do
     print("----------")
     print("INTERFACE:")
-    print("dataset", FLAGS.dataset)
+    # print("dataset", FLAGS.dataset)
     print("arch_cfg", FLAGS.arch_cfg)
     print("data_cfg", FLAGS.data_cfg)
     print("uncertainty", FLAGS.uncertainty)

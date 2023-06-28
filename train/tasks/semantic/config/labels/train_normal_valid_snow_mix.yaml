@@ -1,7 +1,8 @@
 # This file is covered by the LICENSE file in the root of this project.
 name:
   "kitti_multi_snow"
-dataset: ["/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_30", "/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_20", "/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_10", "/home/ailab/AILabDataset/01_Open_Dataset/02_SemanticKITTI/SemanticKITTI_w_images"]
+dataset: 
+  "/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_30,/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_20,/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_10,/home/ailab/AILabDataset/01_Open_Dataset/02_SemanticKITTI/SemanticKITTI_w_images"
 train_db_type:
   "train_normal"
 valid_db_type:

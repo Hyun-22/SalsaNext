@@ -73,6 +73,7 @@ class SemanticKitti(Dataset):
                transform=False,
                db_type = "train"):            # send ground truth?
     # save deats
+    root = root.split(",")
     self.root = [os.path.join(p, "sequences") for p in root]
     self.sequences = sequences
     self.labels = labels
@@ -120,6 +121,7 @@ class SemanticKitti(Dataset):
     # placeholder for filenames
     self.scan_files = []
     self.label_files = []
+    
     if db_type == "train_normal":
         print("Training with normal dataset!!")
         normal_root = [self.root[-1]]
@@ -132,11 +134,11 @@ class SemanticKitti(Dataset):
                     for filename in files:
                         file, ext = os.path.splitext(filename)
                         if ext == '.bin':
-                            tmp_pcd_files.append(os.path.join(path, filename))
+                            self.scan_files.append(os.path.join(path, filename))
                         if self.gt == True:
-                            tmp_label_files.append(os.path.join(seq_path,"labels", "{}.label".format(file)))
+                            self.label_files.append(os.path.join(seq_path,"labels", "{}.label".format(file)))
 
-            print(len(self.scan_files))
+            print("using {} data for trianing! ".format(len(self.scan_files)))
     elif db_type == "train_mix":
         print("Training with mixed dataset!!")
         for idx, data_path in enumerate(self.root):
@@ -158,7 +160,7 @@ class SemanticKitti(Dataset):
             self.label_files += tmp_label_files[crop_len * idx:crop_len * (idx + 1)]
             tmp_pcd_files.clear()
             tmp_label_files.clear()
-            print(len(self.scan_files))        
+        print("using {} data for trianing! ".format(len(self.scan_files)))
         # self.scan_files = self.scan_files[:30]
         # self.label_files = self.label_files[:30]
 
