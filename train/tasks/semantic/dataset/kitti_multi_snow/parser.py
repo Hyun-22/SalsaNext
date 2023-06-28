@@ -120,7 +120,25 @@ class SemanticKitti(Dataset):
     # placeholder for filenames
     self.scan_files = []
     self.label_files = []
-    if db_type == "train":
+    if db_type == "train_normal":
+        print("Training with normal dataset!!")
+        normal_root = [self.root[-1]]
+        for idx, data_path in enumerate(normal_root):
+            tmp_pcd_files = []
+            tmp_label_files = []
+            for seq in self.sequences:
+                seq_path = os.path.join(data_path, "{0:02d}".format(seq))
+                for (path, dir, files) in os.walk(seq_path + "/velodyne"):
+                    for filename in files:
+                        file, ext = os.path.splitext(filename)
+                        if ext == '.bin':
+                            tmp_pcd_files.append(os.path.join(path, filename))
+                        if self.gt == True:
+                            tmp_label_files.append(os.path.join(seq_path,"labels", "{}.label".format(file)))
+
+            print(len(self.scan_files))
+    elif db_type == "train_mix":
+        print("Training with mixed dataset!!")
         for idx, data_path in enumerate(self.root):
             tmp_pcd_files = []
             tmp_label_files = []
@@ -140,12 +158,12 @@ class SemanticKitti(Dataset):
             self.label_files += tmp_label_files[crop_len * idx:crop_len * (idx + 1)]
             tmp_pcd_files.clear()
             tmp_label_files.clear()
-            print(len(self.scan_files))
-        
+            print(len(self.scan_files))        
         # self.scan_files = self.scan_files[:30]
         # self.label_files = self.label_files[:30]
 
     elif db_type == "valid_mix":
+        print("Validation with mix dataset!!")
         for idx, data_path in enumerate(self.root):
             tmp_pcd_files = []
             tmp_label_files = []
@@ -172,6 +190,7 @@ class SemanticKitti(Dataset):
         # print(self.label_files[:10])
         
     elif db_type == "valid_normal":
+        print("Validation with normal dataset!!")
         for seq in self.sequences:
             seq_path = os.path.join(self.root[-1], "{0:02d}".format(seq))
             for (path, dir, files) in os.walk(seq_path + "/velodyne"):
@@ -337,7 +356,9 @@ class Parser():
                batch_size,        # batch size for train and val
                workers,           # threads to load data
                gt=True,           # get gt?
-               shuffle_train=True):  # shuffle training set?
+               shuffle_train=True,
+               train_db_type = "train_mix",
+               valid_db_type = "valid_mix"):  # shuffle training set?
     super(Parser, self).__init__()
 
     # if I am training, get the dataset
@@ -369,7 +390,7 @@ class Parser():
                                        sensor=self.sensor,
                                        max_points=max_points,
                                        transform=True,
-                                       gt=self.gt, db_type='train')
+                                       gt=self.gt, db_type=train_db_type)
 
     self.trainloader = torch.utils.data.DataLoader(self.train_dataset,
                                                    batch_size=self.batch_size,
@@ -387,7 +408,7 @@ class Parser():
                                        learning_map_inv=self.learning_map_inv,
                                        sensor=self.sensor,
                                        max_points=max_points,
-                                       gt=self.gt, db_type='valid_mix')
+                                       gt=self.gt, db_type=valid_db_type)
 
     self.validloader = torch.utils.data.DataLoader(self.valid_dataset,
                                                    batch_size=self.batch_size,

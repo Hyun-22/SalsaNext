@@ -177,9 +177,5 @@ if __name__ == '__main__':
         print("Error copying files, check permissions. Exiting...")
         quit()
 
-    # create trainer and start the training
-    # dataset = ["/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_30", "/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_20", "/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/snow_10", "/home/ailab/AILabDataset/01_Open_Dataset/02_SemanticKITTI/SemanticKITTI_w_images"]
-    # dataset = ["/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/rain_30", "/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/rain_20", "/home/ailab/AILabDataset/02_Custom_Dataset/11_SemanticWeatherRainFog/rain_10", "/home/ailab/AILabDataset/01_Open_Dataset/02_SemanticKITTI/SemanticKITTI_w_images"]
-    dataset = ["/home/ailab/AILabDataset/01_Open_Dataset/02_SemanticKITTI/SemanticKITTI_w_images"]
-    trainer = Trainer(ARCH, DATA, dataset, FLAGS.log, FLAGS.pretrained,FLAGS.uncertainty)
+    trainer = Trainer(ARCH, DATA, DATA["dataset"], FLAGS.log, FLAGS.pretrained,FLAGS.uncertainty)
     trainer.train()

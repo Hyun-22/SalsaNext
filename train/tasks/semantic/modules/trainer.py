@@ -88,27 +88,43 @@ class Trainer():
                      "best_train_iou": 0,
                      "best_val_iou": 0}
         # get the data
-        print(self.DATA["name"])
-        print(self.DATA["name"])
+
         print(self.DATA["name"])
         parserModule = imp.load_source("parserModule",
                                        "/home/ailab/Desktop/git/SalsaNext/train" + '/tasks/semantic/dataset/' +
                                        self.DATA["name"] + '/parser.py')
-        self.parser = parserModule.Parser(root=self.datadir,
-                                          train_sequences=self.DATA["split"]["train"],
-                                          valid_sequences=self.DATA["split"]["valid"],
-                                          test_sequences=None,
-                                          labels=self.DATA["labels"],
-                                          color_map=self.DATA["color_map"],
-                                          learning_map=self.DATA["learning_map"],
-                                          learning_map_inv=self.DATA["learning_map_inv"],
-                                          sensor=self.ARCH["dataset"]["sensor"],
-                                          max_points=self.ARCH["dataset"]["max_points"],
-                                          batch_size=self.ARCH["train"]["batch_size"],
-                                          workers=self.ARCH["train"]["workers"],
-                                          gt=True,
-                                          shuffle_train=True)
-
+        if self.DATA["name"] == "kitti":
+            self.parser = parserModule.Parser(root=self.datadir,
+                                            train_sequences=self.DATA["split"]["train"],
+                                            valid_sequences=self.DATA["split"]["valid"],
+                                            test_sequences=None,
+                                            labels=self.DATA["labels"],
+                                            color_map=self.DATA["color_map"],
+                                            learning_map=self.DATA["learning_map"],
+                                            learning_map_inv=self.DATA["learning_map_inv"],
+                                            sensor=self.ARCH["dataset"]["sensor"],
+                                            max_points=self.ARCH["dataset"]["max_points"],
+                                            batch_size=self.ARCH["train"]["batch_size"],
+                                            workers=self.ARCH["train"]["workers"],
+                                            gt=True,
+                                            shuffle_train=True)
+        elif self.DATA["name"] == "kitti_multi_snow":
+            self.parser = parserModule.Parser(root=self.datadir,
+                                            train_sequences=self.DATA["split"]["train"],
+                                            valid_sequences=self.DATA["split"]["valid"],
+                                            test_sequences=None,
+                                            labels=self.DATA["labels"],
+                                            color_map=self.DATA["color_map"],
+                                            learning_map=self.DATA["learning_map"],
+                                            learning_map_inv=self.DATA["learning_map_inv"],
+                                            sensor=self.ARCH["dataset"]["sensor"],
+                                            max_points=self.ARCH["dataset"]["max_points"],
+                                            batch_size=self.ARCH["train"]["batch_size"],
+                                            workers=self.ARCH["train"]["workers"],
+                                            gt=True,
+                                            shuffle_train=True,
+                                            train_db_type = DATA["train_db_type"],
+                                            valid_db_type = DATA["valid_db_type"])
         # weights for loss (and bias)
         epsilon_w = self.ARCH["train"]["epsilon_w"]
         content = torch.zeros(self.parser.get_n_classes(), dtype=torch.float)
